@@ -31,6 +31,7 @@ configHandler.checkAndCreateConfig = function()
     configHandler.config.wifi.PASSWORD = ""
 
     configHandler.config.main = {}
+    configHandler.config.main.IS_CONFIGURED = false
     configHandler.config.main.MAIN_LOOP_INTERVALL = 1000 * 30
 
     configHandler.config.crypto = {}
@@ -39,8 +40,8 @@ configHandler.checkAndCreateConfig = function()
     configHandler.config.sensors = {}
     configHandler.config.sensors.dht11 = {
       primary = {
-        pin = 6, -- pin
-        id = 1  -- id
+        PIN = 6, -- pin
+        ID = 1  -- id
       }
     }
 

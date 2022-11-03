@@ -1,38 +1,35 @@
--- load util once only and store it
+
+-- load functions once only and store it
 _util = assert(loadfile("util.lua"))()
-
--- load configuration once only and store it
 configHandler = assert(loadfile("configuration.lua"))()
-configHandler.checkAndCreateConfig()
-
-
-dofile("wifiControl.lua")
+wifiControl = assert(loadfile("wifiControl.lua"))()
 
 dofile("exposedHttpServer.lua")
 dofile("dhtReader.lua")
 
--- initial wifi connection
-wifi.sta.config({ssid=configHandler.config.wifi.SSID, pwd=configHandler.config.wifi.PASSWORD})
-
+configHandler.checkAndCreateConfig()
 
 -- Loop function
 function run()
-  if wifiControl.is_connected == true then
-    print("Connection to wifi is available")
-  else
-    print("No wifi connection, reconnecting...")
-    wifi.sta.connect()
+  if not configHandler.config.main.IS_CONFIGURED then return end
+  if configHandler.config.main.IS_CONFIGURED and not wifiControl.is_configured then
+    wifiControl.configure()
+  end
+
+  if not wifiControl.is_connected then
+    return
   end
 
   for key, value in pairs(configHandler.config.sensors.dht11) do
-    print("pin: " .. value.pin .. ", id:" .. value.id)
-    dhtReader.readFromPin(value.pin)
+    print("[" .. key .. "] pin: " .. value.PIN .. ", id:" .. value.ID)
+    dhtReader.readFromPin(value.PIN)
   end
 
 end
 
-
--- setting up main loop timer
+-- execute run once on startup
+run()
+-- setting up main loop timer to execute run
 local mainLoop = tmr.create()
 if mainLoop:alarm(configHandler.config.main.MAIN_LOOP_INTERVALL, tmr.ALARM_AUTO,
  function()
